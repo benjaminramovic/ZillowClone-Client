@@ -1,9 +1,8 @@
 import SwiftUI
-import GoogleSignIn
-import GoogleSignInSwift
 
 struct ContentView: View {
     var body: some View {
+        Text("Hello")
         TabView {
             SearchView()
                 .tabItem {

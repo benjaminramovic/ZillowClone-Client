@@ -8,8 +8,11 @@
 import SwiftUI
 
 struct EstateCard: View {
+    let estate:Estate
     @State private var isFavorite:Bool = false
     @State private var showSheet:Bool = false
+  
+    
     var body: some View {
         VStack {
             ZStack(alignment: .top){
@@ -38,7 +41,7 @@ struct EstateCard: View {
             }
             VStack(spacing:5) {
                 HStack {
-                    Text("225.000 US$")
+                    Text(estate.price)
                         .bold()
                         .font(Font.custom("AvenirLTStd-Black", size: 25))
                     Spacer()
@@ -49,14 +52,14 @@ struct EstateCard: View {
                     }
                 }
                 HStack {
-                    Text("2 ").bold()+Text("bds")+Text("  ")+Text("1 ").bold()+Text("ba")+Text("  ")+Text("910 ").bold()+Text("sqft")+Text("   ")+Text("Townhouse for sale")
+                    Text(String(estate.bedrooms)+" ").bold()+Text("bds")+Text("  ")+Text(String(estate.bathrooms)+" ").bold()+Text("ba")+Text("  ")+Text(String(estate.area)+" ").bold()+Text("sqft")+Text("   ")+Text(estate.title)
                         
                     Spacer()
                         
                 }
                 
                 HStack {
-                    Text("1215 N Taney ST, Philadelphia, PA")
+                    Text(estate.address)
                         .font(Font.custom("AvenirLTStd-Medium", size: 17))
                         .frame(maxWidth:.infinity, alignment: .leading)
                 }
@@ -78,5 +81,5 @@ struct EstateCard: View {
 }
 
 #Preview {
-    EstateCard()
+    EstateCard(estate: Estate(price: "349.400 US$", bedrooms: 4, bathrooms: 2, area: 1.350, title: "Townhouse for sale", address: "3687 Stanton St, Philadelphia, PA"))
 }

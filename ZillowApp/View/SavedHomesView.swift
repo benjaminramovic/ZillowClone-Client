@@ -8,12 +8,22 @@
 import SwiftUI
 
 struct SavedHomesView: View {
+    let buttons = [
+        ("slider.horizontal.2.square.badge.arrow.down","Sort"),
+        ("lines.measurement.horizontal","Filter"),
+        ("checkmark.square","Compare")
+    ]
+    let estates:[Estate] = [
+        Estate(price: "349.400 US$", bedrooms: 4, bathrooms: 2, area: 1.350, title: "Townhouse for sale", address: "3687 Stanton St, Philadelphia, PA"),
+        Estate(price: "345.400 US$", bedrooms: 3, bathrooms: 3, area: 1.455, title: "Townhouse for rent", address: "3117 Stanton St, Philadelphia, PA"),
+        ]
     
     var body: some View {
        
         NavigationStack {
             VStack {
-                VStack {
+                VStack{
+                    Divider()
                     HStack {
                         Image(systemName: "figure.walk")
                         Text("Manage tours").bold()
@@ -22,12 +32,8 @@ struct SavedHomesView: View {
                             .resizable()
                             .frame(width: 15,height:20)
                     }
-                    .overlay {
-                        Rectangle()
-                            .frame(height:1)
-                            .foregroundColor(.black)                        
-                    }
                     .padding()
+                    Divider()
                     HStack {
                         Image(systemName: "message")
                         Text("Contacted rentals").bold()
@@ -37,6 +43,7 @@ struct SavedHomesView: View {
                             .frame(width: 15,height:20)
                     }
                     .padding()
+                    Divider()
                     HStack {
                         Image(systemName: "house")
                         Text("Claim your home").bold()
@@ -44,12 +51,47 @@ struct SavedHomesView: View {
                         Image(systemName: "chevron.right")
                             .resizable()
                             .frame(width: 15,height:20)
-                            
+                        
                     }
                     .padding()
+                    Divider()
+                    HStack {
+                        ForEach(buttons, id:\.0){button in
+                        Button(action:{}){
+                            HStack {
+                                Image(systemName: button.0)
+                                Text(button.1)
+                                    .bold()
+                            }
+                            .foregroundStyle(Color.black)
+                        }
+                        .padding()
+                        .overlay {
+                            Rectangle()
+                                .stroke(Color.black,lineWidth:1)
+                        }
+                                
+                        }
+                    }
+                    .padding(.horizontal)
+                    Divider()
                 }
-                Spacer()
+                VStack {
+                    Text("Your saves")
+                        .frame(maxWidth:.infinity, alignment:.leading)
+                        .bold()
+                    Text(String(estates.count) + " homes")
+                        .frame(maxWidth:.infinity,alignment: .leading)
+                    ScrollView{
+                        ForEach(estates,id: \.self){estate in
+                            EstateCard(estate:estate)
+                        }
+                    }
+                }
+                .padding()
+                
             }
+            .padding(.top,-50)
             .toolbar {
                 ToolbarItem(placement: .principal){
                     Text("Saved homes")
@@ -61,7 +103,9 @@ struct SavedHomesView: View {
                         .foregroundColor(.myBlue)
 
                 }
+                
             }
+
             
             /*VStack(spacing:20) {
              Image(.saved)

@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-//@main
+@main
 struct ZillowAppApp: App {
     var body: some Scene {
         WindowGroup {
-            SearchView()
+            ContentView()
         }
     }
 }
