@@ -10,7 +10,7 @@ import SwiftUI
 struct InboxView: View {
     var body: some View {
         NavigationStack {
-            Spacer()
+            Divider()
             VStack(spacing:20) {
                 Image(.inbox)
                     .resizable()
@@ -38,8 +38,20 @@ struct InboxView: View {
               
                 
             }
-            .navigationTitle("Inbox")
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal){
+                    Text("Inbox").bold().font(.title3)
+                }
+                ToolbarItem(placement: .topBarTrailing){
+                    NavigationLink(destination:SettingsView()){
+                        Image(systemName: "person.crop.circle")
+                            .resizable()
+                            .frame(width: 30,height:30)
+                            .foregroundStyle(Color.black)
+                    }
+                
+                }
+            }
             
         }
     }

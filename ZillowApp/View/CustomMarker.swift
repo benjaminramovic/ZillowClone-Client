@@ -8,22 +8,35 @@
 import SwiftUI
 
 struct CustomMarker: View {
-    let marker: Marker
-    @State private var showAlert = false
+     @State var marker: EstateMain
+    @Binding var current:Int
+    @Binding var isVisible:Bool
+    //@EnvironmentObject var locationManager : LocationManager
+    @State var visited:[Bool] = [false,false,false,false,false,false,false,false,false,false]
 
     var body: some View {
-        Text(marker.price)
+        Text(String(Int(marker.price/1000))+"K")
             .padding(8)
-            .background(Color.red)
+            .background(
+                current == marker.id
+                    ? Color.green
+                : (visited[marker.id]==true ? Color.red.opacity(0.5) : Color.red))
+            
+
+            .foregroundColor(Color.white)
             .foregroundColor(.white)
             .cornerRadius(10)
             .shadow(radius: 5)
             .onTapGesture {
-                showAlert = true
+                current = marker.id
+                isVisible = true
+                visited[marker.id] = true
+                //locationManager.visited[marker.id] = true
             }
-            .alert(isPresented: $showAlert){
+            /*.alert(isPresented: $showAlert){
                 Alert(title: Text("Kliknuli ste na marker sa id-em \(marker.id)!"))
-            }
+            }*/
     }
 }
+
 

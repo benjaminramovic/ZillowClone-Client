@@ -1,21 +1,14 @@
 import SwiftUI
 
+
 struct Carousel: View {
-    @State private var estatesDemo: [EstateDemo] = [
-        EstateDemo(id: 1, color: .blue, visited: false),
-        EstateDemo(id: 2, color: .red, visited: false),
-        EstateDemo(id: 3, color: .green, visited: false)
-    ]
-    
-    @State private var selected: Int = 1 // Initial selection
+    @Binding var estates : [EstateMain]
+    @Binding var selected: Int // Initial selection
     
     var body: some View {
-        EmptyView()
-        /*VStack {
-            // HStack for selecting items
-            HStack {
-                ForEach(estatesDemo.indices, id: \.self) { index in
-                    let demo = estatesDemo[index]
+         
+           /* HStack {
+                ForEach(estatesDemo) { demo in
                     Text(String(demo.id))
                         .padding(15)
                         .background(demo.visited ? Color.red.opacity(0.5) : Color.blue.opacity(0.5))
@@ -26,29 +19,31 @@ struct Carousel: View {
                         }
                         .onTapGesture {
                             selected = demo.id
-                            estatesDemo[index].visited = true
+                            if let index = estatesDemo.firstIndex(where: { $0.id == demo.id }) {
+                                estatesDemo[index].visited = true
+                            }
                         }
                 }
             }
-            .padding(.bottom, 20)
+            .padding(.bottom, 20)*/
+           
             
-            // Paging ScrollView using TabView
-            TabView(selection: $selected) {
-                ForEach(estatesDemo.indices, id: \.self) { index in
-                    let demo = estatesDemo[index]
-                    EstateCard()
-                        .tag(demo.id) // Tag to track selected item
+        TabView(selection: $selected) {
+                ForEach(estates) { demo in
+                    EstateCard(estate: demo)
+                        .tag(demo.id)
                 }
             }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never)) // Snap to page style
-            .frame(height: 400) // Set fixed height for TabView
-        }
-        .padding()
-         */
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+            .frame(height: 400)
+            .onAppear {
+                estates[selected].description = "visited"
+            }
+          
+
+       
     }
 }
 
 
-#Preview {
-    Carousel()
-}
+

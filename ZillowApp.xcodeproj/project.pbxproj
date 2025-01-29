@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A48A6FD92D36F8310003889F /* BottomSheet in Frameworks */ = {isa = PBXBuildFile; productRef = A48A6FD82D36F8310003889F /* BottomSheet */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		A425C6D72CFCDA0E002B36C5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -65,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A48A6FD92D36F8310003889F /* BottomSheet in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +130,7 @@
 			);
 			name = ZillowApp;
 			packageProductDependencies = (
+				A48A6FD82D36F8310003889F /* BottomSheet */,
 			);
 			productName = ZillowApp;
 			productReference = A425C6C62CFCDA0C002B36C5 /* ZillowApp.app */;
@@ -209,6 +215,7 @@
 			mainGroup = A425C6BD2CFCDA0C002B36C5;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				A48A6FD72D36F7F50003889F /* XCRemoteSwiftPackageReference "BottomSheet" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A425C6C72CFCDA0C002B36C5 /* Products */;
@@ -569,6 +576,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A48A6FD72D36F7F50003889F /* XCRemoteSwiftPackageReference "BottomSheet" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/lucaszischka/BottomSheet";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A48A6FD82D36F8310003889F /* BottomSheet */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A48A6FD72D36F7F50003889F /* XCRemoteSwiftPackageReference "BottomSheet" */;
+			productName = BottomSheet;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A425C6BE2CFCDA0C002B36C5 /* Project object */;
 }

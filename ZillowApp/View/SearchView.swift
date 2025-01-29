@@ -7,13 +7,17 @@
 
 import SwiftUI
 import MapKit
+import BottomSheet
 
 struct LocationItem:Identifiable {
     var id = UUID()
     var coordinate:CLLocationCoordinate2D
 }
 
+
 struct SearchView: View {
+    @State var bottomSheetPosition : BottomSheetPosition = .relative(0.2)
+    
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 44.7866, longitude: 20.4489), span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
     )
@@ -25,7 +29,24 @@ struct SearchView: View {
     @State private var isOn:Bool = false
     
     @State private var mapType: MKMapType = .standard
+    @State private var isVisible2:Bool = false
+    @State var current:Int = 0
+    @State private var resultsText: String = "No matching results"
 
+
+    @State private var isNavigatingToSearch = false
+    @State private var isNavigatingToUpdates = false
+    @State private var isNavigatingToSavedHomes = false
+    @State private var isNavigatingToHomeLoans = false
+    @State private var isNavigatingToInbox = false
+    
+    @State private var expanded: Bool = false // Da kontrolišemo da li je div proširen
+    @State private var expandedHeight: CGFloat = 100 // Početna visina (može biti manja)
+    @State private var minHeight: CGFloat = 50 // Minimalna visina div-a
+
+
+
+    
     let markers = [
           Marker(location: CLLocationCoordinate2D(latitude: 44.8176, longitude:20.4569), price: "$499K"),
           Marker(location: CLLocationCoordinate2D(latitude: 45.7634, longitude: 30.4289), price: "$1.2M"),
@@ -34,313 +55,210 @@ struct SearchView: View {
     let climateRisks = ["Flood","Fire","Wind","Air","Heat"]
     let amenities:[String] = ["Banks","Coffee shops","Gas","Grocers"]
     let amenitiesIcons:[String] = ["dollarsign","mug.fill","fuelpump","cart",]
-
     
-    let locations:[LocationItem] = [
-        LocationItem(coordinate:CLLocationCoordinate2D(latitude: 44.8176, longitude: 20.4569)),
-        LocationItem(coordinate:CLLocationCoordinate2D(latitude: 44.7634, longitude: 20.4289)),
-        LocationItem(coordinate:CLLocationCoordinate2D(latitude: 44.7638, longitude: 20.4285))
-    ]
+    @State private var cuurent:Int = 0
+
+    @StateObject var viewModel = EstateViewModel()
+    
+    @State private var screenHeight: CGFloat = UIScreen.main.bounds.height
+
     @State private var showSheet:Bool = true
+    @State private var isPresented:Bool = true
+    @State private var demo = 0
+    @State private var bp = 0
+    
+    @State var mapOption = 1
+    @State private var cameraPosition = MapCameraPosition.region(
+           MKCoordinateRegion(
+               center: CLLocationCoordinate2D(latitude: 44.7866, longitude: 20.4489),
+               span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+           )
+       )
+    @EnvironmentObject var locationManager:LocationManager
+
     var body: some View {
         NavigationStack {
             VStack {
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundStyle(.gray)
-                    TextField("Home feature, school, location",text: .constant(""))
-                        .padding(8)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 5)
-                                .stroke(Color.gray)
-                        }
-                    NavigationLink(destination:Filters()){
-                        Image(systemName: "lines.measurement.horizontal")
-                            .foregroundStyle(Color.myBlue)
-                    }
-                    
-                    
-                }
-                .padding(.horizontal)
+                SearchBarView()
                 Spacer()
                 
                 
-                Map(coordinateRegion: $region, annotationItems: markers){ marker in
+                Map(coordinateRegion: $region, annotationItems: viewModel.estates){ estate in
                     /*MapMarker(coordinate: location.coordinate, tint:.red)*/
-                    MapAnnotation(coordinate: marker.location) {
-                                   CustomMarker(marker: marker)
-                               }
+                    MapAnnotation(coordinate: CLLocationCoordinate2DMake(estate.latitude, estate.longitude)) {
+                        CustomMarker(marker: estate, current: $current, isVisible: $isVisible2)
+                            .onTapGesture {
+                                current = estate.id
+                            }
+                          
                     
+                    }
+                    
+                }
+                .mapStyle(mapOption==1 ? .standard : (mapOption==2 ? .imagery : .hybrid(elevation:.realistic)))
+                .onAppear {
+                    print("Mapa je učitana sa regionom: \(region.center.latitude), \(region.center.longitude)")
+                }
+                .onTapGesture {
+                    if isVisible2==true {
+                        isVisible2 = false
+                        current = 0
+                    }
                 }
             
                 .overlay {
-                    HStack {
-                        HStack{
-                            Button(action: {
-                                showSheet2 = true
-                            }){
-                                Image(systemName: "square.3.layers.3d")
-                            }
-                            .sheet(isPresented:$showSheet2){
-                                VStack {
-                                    HStack{
-                                        Text("Map options")
-                                            .bold()
-                                            .frame(maxWidth:.infinity,alignment:.leading)
+                    if isVisible2 {
+                        Carousel(estates: $viewModel.estates,selected:$current)
+                            .padding(.top,200)
+                    }
+                    else {
+                            Spacer()
+                        MapOptionsLineView(region: $region, option: $mapOption)
+                                .padding(.horizontal)
+                                .padding(.top,470)
+                            
+                               .bottomSheet(bottomSheetPosition: self.$bottomSheetPosition, switchablePositions: [.relative(0.2),.relative(0.4),.relativeTop(1)]){
+                                    ZStack {
                                         
-                                        
-                                        Image(systemName: "x.circle")
-                                            .foregroundStyle(.gray)
-                                            .onTapGesture {
-                                                showSheet2 = false
-                                            }
-                                        
-                                    }
-                                    .padding()
-                                    Divider()
-                                    HStack(spacing:35) {
                                         VStack {
-                                            Image(systemName:"map")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .padding(10)
-                                                .background(Circle().fill(Color.gray.opacity(0.2)))
-                                                .clipShape(Circle())
-                                                .frame(width:60,height:60)
-                                                .overlay {
-                                                    Circle()
-                                                        .stroke(selectedImage == "map" ? Color.blue : Color.clear,lineWidth:3)
-                                                }
-                                                .onTapGesture {
-                                                    selectedImage = "map"
-                                                    mapType = .standard
-                                                }
-                                            Text("Default")
-                                                .font(.subheadline)
-                                                .foregroundStyle(selectedImage == "map" ? Color.blue : Color.black)
-                                        }
-                                        VStack {
-                                            Image(systemName:"globe")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .padding(10)
-                                                .background(Circle().fill(Color.gray.opacity(0.2)))
-                                                .clipShape(Circle())
-                                                .frame(width:60,height:60)
-                                                .overlay {
-                                                    Circle()
-                                                        .stroke(selectedImage == "globe" ? Color.blue : Color.clear,lineWidth:3)
-                                                }
-                                                .onTapGesture {
-                                                    selectedImage = "globe"
-                                                    mapType = .satellite
-                                                }
-                                            Text("Satelite")
-                                                .font(.subheadline)
-                                                .foregroundStyle(selectedImage == "globe" ? Color.blue : Color.black)
-                                        }
-                                        VStack {
-                                            Image(systemName:"cube")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .padding(10)
-                                                .background(Circle().fill(Color.gray.opacity(0.2)))
-                                                .clipShape(Circle())
-                                                .frame(width:60,height:60)
-                                                .overlay {
-                                                    Circle()
-                                                        .stroke(selectedImage == "cube" ? Color.blue : Color.clear,lineWidth:3)
-                                                }
-                                                .onTapGesture {
-                                                    selectedImage = "cube"
-                                                    mapType = .hybrid
-                                                }
-                                            Text("3D View")
-                                                .font(.subheadline)
-                                                .foregroundStyle(selectedImage == "cube" ? Color.blue : Color.black)
-                                        }
-                                    }
-                                    .padding()
-                                    Divider()
-                                    VStack(alignment:.leading) {
-                                        Text("Climate risks")
-                                            .font(.system(size:20))
-                                            .bold()
-                                        
-                                        
-                                        HStack(spacing:15) {
-                                            ForEach(climateRisks,id:\.self){risk in
-                                                Text(risk)
-                                                
-                                                    .bold()
-                                                    .font(.system(size:16))
-                                                    .padding(8)
-                                                    .foregroundColor(selectedRisk==risk ? Color.blue : Color.black)
-                                                    .overlay {
-                                                        Rectangle()
-                                                            .stroke(selectedRisk==risk ? Color.blue : Color.black,lineWidth:2)
-                                                        
+                                            Text("\(viewModel.estates.count) found").bold().padding()
+                                            ScrollView {
+                                                VStack(spacing: 10) { // Dodajte razmak između kartica za bolju vidljivost
+                                                    ForEach(viewModel.estates) { estate in
+                                                        NavigationLink(destination:EstateView(estate:estate)){
+                                                            EstateCard(estate: estate)
+                                                                .frame(maxWidth: .infinity) // Osigurajte da kartica zauzima maksimalnu širinu
+                                                        }
+                                                        .foregroundStyle(Color.black)
                                                         
                                                     }
-                                                    .onTapGesture {
-                                                        selectedRisk = risk
-                                                    }
+                                                }
                                             }
-                                        }
-                                        // Poravnanje celog HStack-a
-                                        
-                                    }
-                                    .frame(maxWidth:.infinity,alignment:.leading)
-                                    .padding(.horizontal)
-                                    
-                                    Divider()
-                                    VStack {
-                                        HStack {
-                                            Text("Neighborhood amenities")
-                                                .bold()
-                                                .font(.system(size:20))
-                                                .frame(maxWidth:.infinity,alignment:.leading)
-                                            Toggle("", isOn:$isOn)
-                                                .labelsHidden()
+                                            .frame(maxHeight: UIScreen.main.bounds.height)
                                             
                                         }
-                                        if isOn {
-                                            HStack(spacing:15) {
-                                                VStack {
-                                                    Image(systemName:"cart")
-                                                        .resizable()
-                                                        .scaledToFit()
-                                                        .padding(10)
-                                                        .background(Circle().fill(Color.gray.opacity(0.2)))
-                                                        .clipShape(Circle())
-                                                        .frame(width:40,height:40)
-                                                        .overlay {
-                                                            Circle()
-                                                                .stroke(selectedAnemity == "grocers" ? Color.blue : Color.clear,lineWidth:3)
-                                                        }
-                                                        .onTapGesture {
-                                                            selectedAnemity = "grocers"
-                                                            mapType = .hybrid
-                                                        }
-                                                    Text("Grocers")
-                                                        .font(.subheadline)
-                                                        .foregroundStyle(selectedAnemity == "grocers" ? Color.blue : Color.black)
+                                        if bottomSheetPosition == .relativeTop(1) {
+                                            
+                                            Button(action:{
+                                                withAnimation {
+                                                    bottomSheetPosition = .relative(0.2)
                                                 }
-                                                VStack {
-                                                    Image(systemName:"mug.fill")
-                                                        .resizable()
-                                                        .scaledToFit()
-                                                        .padding(10)
-                                                        .background(Circle().fill(Color.gray.opacity(0.2)))
-                                                        .clipShape(Circle())
-                                                        .frame(width:40,height:40)
-                                                        .overlay {
-                                                            Circle()
-                                                                .stroke(selectedAnemity == "coffee shops" ? Color.blue : Color.clear,lineWidth:3)
-                                                        }
-                                                        .onTapGesture {
-                                                            selectedAnemity = "coffee shops"
-                                                            mapType = .hybrid
-                                                        }
-                                                    Text("Coffee shops")
-                                                        .font(.subheadline)
-                                                        .foregroundStyle(selectedAnemity == "coffee shops" ? Color.blue : Color.black)
-                                                }
-                                                VStack {
-                                                    Image(systemName:"fuelpump")
-                                                        .resizable()
-                                                        .scaledToFit()
-                                                        .padding(10)
-                                                        .background(Circle().fill(Color.gray.opacity(0.2)))
-                                                        .clipShape(Circle())
-                                                        .frame(width:40,height:40)
-                                                        .overlay {
-                                                            Circle()
-                                                                .stroke(selectedAnemity == "gas" ? Color.blue : Color.clear,lineWidth:3)
-                                                        }
-                                                        .onTapGesture {
-                                                            selectedAnemity = "gas"
-                                                            mapType = .hybrid
-                                                        }
-                                                    Text("Gas")
-                                                        .font(.subheadline)
-                                                        .foregroundStyle(selectedAnemity == "gas" ? Color.blue : Color.black)
-                                                }
+                                            }) {
+                                                Image(systemName: "map")
+                                                Text("Map")
                                             }
-                                            .frame(maxWidth:.infinity,alignment:.leading)
-                                            .padding(.horizontal)
+                                            .bold()
+                                            .padding(15)
+                                            .foregroundStyle(Color.white)
+                                            .background(Color.darkBlue)
+                                            .cornerRadius(22)
+                                            .shadow(radius: 10)
+                                            .transition(.opacity)
+                                            .padding(.top, UIScreen.main.bounds.height - 360) // Visina ekrana minus 80
+                                            
+
+                                         
                                         }
+                                        
                                     }
                                     
-                                    .padding()
                                     
-                                
-                            }
-                                .padding(.vertical)
-                            .presentationDetents([.medium,.large])
-                            .presentationDragIndicator(.automatic)
-                        }
+
+                                }
+                               
+//
+                                }
                         
-                        .padding(7)
-                        .background(Color.white)
-                        .foregroundStyle(Color.black)
-                        .cornerRadius(20)
-                        .font(.system(size: 23))
-                        .shadow(radius: 13)
-                        Button(action: {}){
-                            Image(systemName: "hand.draw")
-                        }
-                        .padding(7)
-                        .background(Color.white)
-                        .foregroundStyle(Color.black)
-                        .cornerRadius(20)
-                        .font(.system(size: 23))
-                        .shadow(radius: 13)
-                        Button(action: {}){
-                            Image(systemName: "location")
-                        }
-                        .padding(7)
-                        .background(Color.white)
-                        .foregroundStyle(Color.black)
-                        .cornerRadius(20)
-                        .font(.system(size: 23))
-                        .shadow(radius: 13)
                     }
-                    Spacer()
-                    Button(action:{}) {
-                        
-                        Label("Save Search",systemImage: "magnifyingglass")
-                            .padding(10)
-                            .background(Color.myBlue)
-                            .foregroundStyle(.white)
-                            .cornerRadius(15)
-                            .bold()
-                            .font(.system(size: 15))
-                            .shadow(radius: 13)
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.top,260)
             }
             
             
             
         }
-        .overlay(alignment:.bottom) {
+          
+            /*.sheet(isPresented: $isPresented) {
+                    VStack {
+                        Spacer()
+                HStack {
+                            TabBarItem(title: "Search", systemImage: "magnifyingglass", index: 0)
+                                
+                            Spacer()
+                            TabBarItem(title: "Updates", systemImage: "heart.text.square", index: 1)
+                            Spacer()
+                                              TabBarItem(title: "Saved Homes", systemImage: "heart.fill", index: 2)
+                                                  .onTapGesture {
+                                                      demo = 3
+                                                  }
+                                          
+                            Spacer()
+                            TabBarItem(title: "Home Loans", systemImage: "dollarsign.circle",index:3)
+                            Spacer()
+                            TabBarItem(title: "Inbox", systemImage: "tray",index:4)
+                        }
+                        .padding()
+                        .cornerRadius(20)
+                        .shadow(radius: 5)
+                    }
+                
+                .presentationDragIndicator(.visible) // Prikazuje indikator za povlačenje
+                .presentationDetents([.height(200)]) // Određuje visinu sheet-a
+            }*/
+
             
-            SearchMapSheetContentView()
-                .transition(.move(edge: .bottom))
+            /*.overlay(alignment:.bottom) {
+                if viewModel.estates.count > 0 {
+                    if isVisible2==true {
+                        SearchMapSheetContentView(minHeight: 80,text: $resultsText,estates: viewModel.estates)
+                        .transition(.move(edge: .bottom))
+                        .onAppear {
+                            
+                            resultsText = "\(viewModel.estates.count) results"
+                            
+                            
+                        }
+                }
+                else {
+                    SearchMapSheetContentView(minHeight: 80, text:$resultsText,maxHeight:screenHeight,estates: viewModel.estates)
+                        .transition(.move(edge: .bottom))
+                        .onAppear {
+                            resultsText = "\(viewModel.estates.count) results"
+                        }
+                    
+                }
+            }
+        }*/
+        .onAppear {
+            viewModel.getAllEstates()
         }
-        .animation(.easeInOut)
+        
     }
 }
-}
+
 
 
 #Preview {
     SearchView()
+        .environmentObject(LocationManager())
 }
 
-
-
-
+struct TabBarItem: View {
+    let title: String
+    let systemImage: String
+    let index: Int
+    
+    var body: some View {
+            VStack {
+                Image(systemName: systemImage)
+                    .font(.system(size: 24))
+                    .foregroundColor(.gray)
+                
+                Text(title)
+                    .font(.footnote)
+                    .foregroundColor(.gray)
+            }
+        
+        }
+        
+        
+    
+}

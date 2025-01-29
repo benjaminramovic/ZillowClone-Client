@@ -7,10 +7,13 @@
 
 import SwiftUI
 
-struct EstateCard: View {
+struct EstateSavedCard: View {
     let estate: EstateMain
-    @State private var isFavorite: Bool = false
+    let isChecked:Bool
+    @State private var isFavorite: Bool = true
     @State private var showSheet: Bool = false
+    @State private var check: Bool = false
+
   
     var body: some View {
         VStack {
@@ -21,16 +24,27 @@ struct EstateCard: View {
                     Button(action: {
                         isFavorite.toggle()
                     }) {
-                        Image(systemName: "heart.fill")
-                            .resizable()
-                            .frame(width: 35, height: 35)
-                            .foregroundStyle(!isFavorite ? .black.opacity(0.3) : Color.white)
-                            .overlay {
-                                Image(systemName: "heart")
-                                    .resizable()
-                                    .frame(width: 35, height: 35)
-                                    .foregroundStyle(.white)
-                            }
+                        if !isChecked {
+                            Image(systemName: "heart.fill")
+                                .resizable()
+                                .frame(width: 35, height: 35)
+                                .foregroundStyle(!isFavorite ? .black.opacity(0.3) : Color.white)
+                                .overlay {
+                                    Image(systemName: "heart")
+                                        .resizable()
+                                        .frame(width: 35, height: 35)
+                                        .foregroundStyle(.white)
+                                }
+                        }
+                        else {
+                            Image(systemName: check ? "checkmark.rectangle.fill" :  "rectangle.fill")
+                                .resizable()
+                                .frame(width: 35, height: 35)
+                                .onTapGesture {
+                                    check.toggle()
+                                }
+                                .foregroundColor(check ? Color.myBlue : Color.white)
+                        }
                     }
                 }
                 .padding()
@@ -88,5 +102,5 @@ struct EstateCard: View {
 }
 
 #Preview {
-    EstateCard(estate: EstateMain(id: 1, title: "Title", description: "Description", price: 123.5, latitude: 41.1234, longitude: 21.1123))
+    EstateSavedCard(estate: EstateMain(id: 1, title: "Title", description: "Description", price: 123.5, latitude: 41.1234, longitude: 21.1123),isChecked: true)
 }
