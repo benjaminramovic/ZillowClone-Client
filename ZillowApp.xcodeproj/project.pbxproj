@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		A48A6FD92D36F8310003889F /* BottomSheet in Frameworks */ = {isa = PBXBuildFile; productRef = A48A6FD82D36F8310003889F /* BottomSheet */; };
+		A4D879192D6E6F3D003AA1A0 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = A4D879182D6E6F3D003AA1A0 /* FirebaseAuth */; };
+		A4D8791C2D6E734A003AA1A0 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = A4D8791B2D6E734A003AA1A0 /* GoogleSignIn */; };
+		A4D8791E2D6E734A003AA1A0 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A4D8791D2D6E734A003AA1A0 /* GoogleSignInSwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +73,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				A48A6FD92D36F8310003889F /* BottomSheet in Frameworks */,
+				A4D879192D6E6F3D003AA1A0 /* FirebaseAuth in Frameworks */,
+				A4D8791C2D6E734A003AA1A0 /* GoogleSignIn in Frameworks */,
+				A4D8791E2D6E734A003AA1A0 /* GoogleSignInSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,6 +137,9 @@
 			name = ZillowApp;
 			packageProductDependencies = (
 				A48A6FD82D36F8310003889F /* BottomSheet */,
+				A4D879182D6E6F3D003AA1A0 /* FirebaseAuth */,
+				A4D8791B2D6E734A003AA1A0 /* GoogleSignIn */,
+				A4D8791D2D6E734A003AA1A0 /* GoogleSignInSwift */,
 			);
 			productName = ZillowApp;
 			productReference = A425C6C62CFCDA0C002B36C5 /* ZillowApp.app */;
@@ -216,6 +225,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				A48A6FD72D36F7F50003889F /* XCRemoteSwiftPackageReference "BottomSheet" */,
+				A4D879172D6E6F3D003AA1A0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				A4D8791A2D6E734A003AA1A0 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A425C6C72CFCDA0C002B36C5 /* Products */;
@@ -586,6 +597,22 @@
 				minimumVersion = 3.1.1;
 			};
 		};
+		A4D879172D6E6F3D003AA1A0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.9.0;
+			};
+		};
+		A4D8791A2D6E734A003AA1A0 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -593,6 +620,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A48A6FD72D36F7F50003889F /* XCRemoteSwiftPackageReference "BottomSheet" */;
 			productName = BottomSheet;
+		};
+		A4D879182D6E6F3D003AA1A0 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A4D879172D6E6F3D003AA1A0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		A4D8791B2D6E734A003AA1A0 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A4D8791A2D6E734A003AA1A0 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		A4D8791D2D6E734A003AA1A0 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A4D8791A2D6E734A003AA1A0 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

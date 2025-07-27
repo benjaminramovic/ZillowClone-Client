@@ -10,7 +10,18 @@
 			<key>CFBundleURLName</key>
 			<string></string>
 			<key>CFBundleURLSchemes</key>
-			<array/>
+			<array>
+				<string>com.googleusercontent.apps.866241473634-qfh85udvkhi99la20ekht1ni0it59l47</string>
+			</array>
+		</dict>
+		<dict/>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.150461855183-72dru5loo3bf7s3jidmfjdd9umlbuid4</string>
+			</array>
 		</dict>
 	</array>
 	<key>UIAppFonts</key>
@@ -19,6 +30,11 @@
 		<string>AvenirLTStd-Black.otf</string>
 		<string>GT-Walsheim-Bold-Trial-BF651b7fc737c57.otf</string>
 		<string>AvenirNext-Regular.ttc</string>
+	</array>
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+		<dict/>
+		<dict/>
 	</array>
 </dict>
 </plist>

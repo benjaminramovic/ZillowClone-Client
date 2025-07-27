@@ -13,10 +13,17 @@ struct Filters: View {
     @State private var selectedMax = 0;
     @State private var selectedBathroom = 0;
     let numbersMin = ["No Min","1","2"]
-    let numbersMax = ["No Max","1","2"]
+    let numbersMax = ["No Max","4","5"]
     let bathrooms = ["Any","1","2"]
-    
     @State private var isOn = false
+    @State var selectedTypes:[String] = []
+    @State var homeTypes:[String] = ["Houses","Townnhouses","Apartments"]
+    @State var forSale:Bool = true
+    @State var isAvailable:Bool = true
+    
+    @State var minPrice:Double = 0
+    @State var maxPrice:Double = 5000
+    @State private var isEditing = false
 
 
     init(){
@@ -47,12 +54,36 @@ struct Filters: View {
     var body: some View {
         NavigationStack {
             VStack(spacing:20){
+                Text("Show filters")
+                    .onTapGesture {
+                        print("forSale: \(forSale)")
+                        print("isAvailable: \(isAvailable)")
+                        print("minBedrooms: \(numbersMin[selectedMin])")
+                        print("maxBedrooms: \(numbersMax[selectedMax])")
+                        print("bathrooms: \(selectedBathroom)")
+                        print("Selected home types: \(selectedTypes)")
+                    }
+                
                 Picker("Tab",selection: $selectedTab){
                  Text("For Sale").tag("For Sale")
                  Text("For Rent").tag("For Rent")
                  Text("Recently Sold").tag("Recently Sold")
                  }
                  .pickerStyle(SegmentedPickerStyle())
+                 .onChange(of:selectedTab){item in
+                     switch(item) {
+                        case "For Rent":
+                         forSale = false
+                        case "Recently Sold":
+                         isAvailable = false
+                         forSale = false
+                     default:
+                         isAvailable=true
+                         forSale=true
+                     
+                     }
+                     
+                 }
                  
                 VStack(alignment:.leading) {
                     Text("Price range")
@@ -66,7 +97,7 @@ struct Filters: View {
                     
                     
                 }
-                ZStack {
+                /*ZStack {
                     // Traka
                     Rectangle()
                         .frame(width: 400, height: 2)
@@ -77,7 +108,26 @@ struct Filters: View {
                    
 
                     
+                }*/
+                HStack {
+                    Text(String(minPrice))
+                        .frame(maxWidth: .infinity,alignment: .center)
+                        
+                    Text(String(maxPrice))
+                        .frame(maxWidth: .infinity,alignment: .center)
                 }
+                HStack {
+                    Slider(value:$minPrice,in:0...5000,step:100,onEditingChanged: { editing in
+                        isEditing = editing
+                    } )
+                    .padding(.trailing,-30)
+                    Slider(value:$maxPrice,in:5000...50000,step:100,onEditingChanged: { editing in
+                        isEditing = editing
+                    } )
+                    .padding(0)
+                    
+                }
+                .padding(0)
                 Divider()
                 .padding(.horizontal, 100)
                 .padding()
@@ -101,7 +151,9 @@ struct Filters: View {
                         
                         Picker(selection: $selectedMax, label: Text("No Max")) {
                             ForEach(0..<numbersMax.count, id: \.self) {
-                                Text(String(numbersMax[$0]))
+                                
+                                    Text(String(numbersMax[$0]))
+                                
                                  }
                                }
                         .frame(maxWidth: .infinity)
@@ -135,13 +187,18 @@ struct Filters: View {
                 VStack(alignment:.leading) {
                     Text("Home type")
                         .bold()
-                    Toggle(isOn:$isOn){
-                        Text("Houses")
-                            .foregroundColor(.black)
+                    ForEach(homeTypes,id:\.self){item in
+                        Toggle(isOn:$isOn){
+                            Text(item)
+                                .foregroundColor(.black)
+                                                    }
+                        
+                        .toggleStyle(iOSCheckboxToggleStyle())
+                        .frame(maxWidth:.infinity,alignment:.leadingFirstTextBaseline)
                     }
-                    .toggleStyle(iOSCheckboxToggleStyle())
-                    .frame(maxWidth:.infinity,alignment:.leadingFirstTextBaseline)
-                    Toggle(isOn:$isOn){
+                    
+                    
+                    /*Toggle(isOn:$isOn){
                         Text("Townhouses")
                             .foregroundColor(.black)
                     }
@@ -152,7 +209,7 @@ struct Filters: View {
                             .foregroundColor(.black)
                     }
                     .toggleStyle(iOSCheckboxToggleStyle())
-                    .frame(maxWidth:.infinity,alignment:.leadingFirstTextBaseline)
+                    .frame(maxWidth:.infinity,alignment:.leadingFirstTextBaseline) */
                     
                 }
                     

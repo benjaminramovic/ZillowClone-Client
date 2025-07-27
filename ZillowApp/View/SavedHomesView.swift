@@ -9,35 +9,37 @@ import SwiftUI
 
 struct SavedHomesView: View {
     let buttons = [
-        ("lines.measurement.horizontal","Filter"),
+        ("slider.vertical.3","Filter"),
         ("checkmark.square","Compare")
     ]
-    let estates:[EstateMain] = [
-        EstateMain(id: 1, title: "Nekretnina", description: "Opis", price: 1234, latitude: 41.1234, longitude: 50.1234),
-        EstateMain(id: 2, title: "Nekretnina", description: "Opis", price: 1234, latitude: 41.1234, longitude: 50.1234)
-    ]
+    @StateObject var viewModel = EstateViewModel()
+   
     @State var isFlipped = false
     @State private var showFilter:Bool = false
     @State private var showCompare:Bool = false
-    
     @State private var isOn:Bool = false
     
     @State private var estatesForCompare:[EstateMain] = []
     
-   
-    
+    @EnvironmentObject var locationManager:LocationManager
+    @EnvironmentObject var auth: AuthenticationView
+
     
     var body: some View {
         
         NavigationStack {
             
             VStack{
+              
+
                 Divider()
                 NavigationLink(destination:EmptyView()){
                     HStack {
                         Image(systemName: "figure.walk")
                         Text("Manage tours").bold()
                             .font(Font.custom("AvenirLTStd-Medium", size: 18)).bold()
+                        
+                        
                         Spacer()
                         Image(systemName: "chevron.right")
                             .resizable()
@@ -142,11 +144,11 @@ struct SavedHomesView: View {
                 Text("Your saves")
                     .frame(maxWidth:.infinity, alignment:.leading)
                     .font(Font.custom("AvenirLTStd-Black", size: 18)).bold()
-                Text(String(estates.count) + " homes")
+                Text(String(viewModel.savedEstates.count) + " homes")
                     .frame(maxWidth:.infinity,alignment: .leading)
                     .font(Font.custom("AvenirLTStd-Medium", size: 18))
                 ScrollView{
-                    ForEach(estates,id: \.self){estate in
+                    ForEach(viewModel.savedEstates,id: \.self){estate in
                         EstateSavedCard(estate:estate,isChecked: showCompare)
                             .overlay {
                                 if showCompare == true{
@@ -170,19 +172,22 @@ struct SavedHomesView: View {
                                 
                                 .padding()
                             }
+                     
+                                
                                 
                             }
+                        
                     }
                 }
             }
             .padding()
-            .overlay {
+            /*.overlay {
                 if showFilter==true {
                     Rectangle()
                         .fill(Color.black.opacity(0.3))
                         .frame(maxWidth:.infinity,maxHeight: .infinity)
                 }
-            }
+            }*/
             .overlay {
                 if showCompare {
                     VStack {
@@ -243,67 +248,22 @@ struct SavedHomesView: View {
                     
                 }
                 }
+        
             
-                
+            .task {
+                  
+                viewModel.getSavedEstates(uid: 40)
+                  
+              }
            
             
         }
-        
-        
-        
-        // .padding(.top,-50)
-        
+   
+       
         
         
     }
-    
-    
-    /*VStack(spacing:20) {
-     Image(.saved)
-     .resizable()
-     .frame(width: .infinity,height: 120,alignment: .center)
-     .padding(.top,200)
-     
-     Text("Save your favorite homes")
-     .font(Font.custom("AvenirLTStd-Black", size: 25))
-     Text("Sign up to save your favorite homes and get innstant alerts when they are updated.")
-     .font(Font.custom("AvenirLTStd-Medium", size: 17))
-     .foregroundStyle(Color.gray)
-     .multilineTextAlignment(.center)
-     .lineSpacing(10)
-     NavigationLink(destination: LoginRegisterView()) {
-     Text("Create an account")
-     .frame(width: 320)
-     .edgesIgnoringSafeArea(.all)
-     .padding(10)
-     .background(Color.myBlue)
-     .foregroundStyle(Color.white)
-     .cornerRadius(8)
-     .font(Font.custom("AvenirLStd-Medium", size: 17))
-     }
-     .frame(width: .infinity)
-     
-     .padding(.horizontal)
-     Spacer()
-     HStack(alignment: .bottom) {
-     Text("Already saved a home?")
-     .foregroundStyle(.gray)
-     .font(Font.custom("AvenirLTStd-Medium", size: 17))
-     NavigationLink(destination: LoginView()){
-     Text("Sign in now.")
-     .foregroundStyle(Color.myBlue)
-     .font(Font.custom("AvenirLTStd-Medium", size: 17))
-     }
-     
-     }
-     .padding(.bottom,22)
-     
-     }
-     .navigationTitle("Saved Homes")
-     .navigationBarTitleDisplayMode(.inline)
-     */
-    
-    
+ 
     
 }
 
@@ -311,5 +271,11 @@ struct SavedHomesView: View {
  
 
 #Preview {
-    SavedHomesView()
+  
+        let locationManager = LocationManager()
+        let auth = AuthenticationView()
+
+        return SavedHomesView()
+            .environmentObject(auth)
+            .environmentObject(locationManager)
 }

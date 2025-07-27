@@ -10,7 +10,7 @@ import SwiftUI
 struct SearchMapSheetContentView: View {
     
     @State var estates: [EstateMain]
-    
+
     var body: some View {
         VStack {
             ScrollView {

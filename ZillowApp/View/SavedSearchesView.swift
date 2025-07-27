@@ -10,8 +10,35 @@ import SwiftUI
 struct SavedSearchesView: View {
     @State var text:String=""
     let estates:[EstateMain] = [
-        EstateMain(id: 1, title: "Nekretnina", description: "Opis", price: 1234, latitude: 41.1234, longitude: 50.1234),
-        EstateMain(id: 2, title: "Nekretnina", description: "Opis", price: 1234, latitude: 41.1234, longitude: 50.1234)
+        EstateMain(
+                    id: 2,
+                    title: "Cozy Studio",
+                    description: "Perfect for students, near downtown.",
+                    price: 75000.0,
+                    location: "456 Small Street, Metro City",
+                    estateType: "Studio",
+                    forSale: false,
+                    numberOfRooms: 1,
+                    squareFootage: 30.0,
+                    latitude: 48.8566,
+                    longitude: 2.3522,
+                    yearBuilt: 2010,
+                    floor: 2,
+                    heatingType: "Electric",
+                    parkingSpaces: 0,
+                    hasGarage: false,
+                    hasGarden: false,
+                    place: "Metro City",
+                    imageURLs: ["https://via.placeholder.com/300"],
+                    ownerName: "Jane Smith",
+                    ownerContact: "jane.smith@example.com",
+                    viewCount: 85,
+                    days: 3,
+                    numSaved: 10,
+                    isFurnished: true,
+                    isAvailable: true
+                ),
+        /*EstateMain(id: 2, title: "Nekretnina", description: "Opis", price: 1234, latitude: 41.1234, longitude: 50.1234)*/
     ]
     var body: some View {
         

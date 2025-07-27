@@ -13,6 +13,9 @@ struct EstateSavedCard: View {
     @State private var isFavorite: Bool = true
     @State private var showSheet: Bool = false
     @State private var check: Bool = false
+    //@Binding var present:Bool
+    @StateObject var vm = EstateViewModel()
+    @EnvironmentObject var auth:AuthenticationView
 
   
     var body: some View {
@@ -35,6 +38,16 @@ struct EstateSavedCard: View {
                                         .frame(width: 35, height: 35)
                                         .foregroundStyle(.white)
                                 }
+                            
+                                .onTapGesture {
+                                    isFavorite.toggle()
+                                    if let index = vm.savedEstates.firstIndex(of:estate){
+                                        vm.savedEstates.remove(at: index)
+                                    }
+                                    vm.unsaveEstate(userId: auth.uid ?? 40, estateId: estate.id)
+                                   
+                                }
+                           
                         }
                         else {
                             Image(systemName: check ? "checkmark.rectangle.fill" :  "rectangle.fill")
@@ -98,9 +111,42 @@ struct EstateSavedCard: View {
                 .padding(.horizontal)
         }
         .background(Color.white)
+    
     }
 }
 
 #Preview {
-    EstateSavedCard(estate: EstateMain(id: 1, title: "Title", description: "Description", price: 123.5, latitude: 41.1234, longitude: 21.1123),isChecked: true)
+    EstateCard(estate: EstateMain(
+        id: 1,
+        title: "Modern Apartment",
+        description: "Spacious apartment with a great city view.",
+        price: 250000.0,
+        location: "123 Main Street, Cityville",
+        estateType: "Apartment",
+        forSale: true,
+        numberOfRooms: 3,
+        squareFootage: 85.0,
+        latitude: 41.9028,
+        longitude: 12.4964,
+        yearBuilt: 2015,
+        floor: 5,
+        heatingType: "Central",
+        parkingSpaces: 1,
+        hasGarage: true,
+        hasGarden: false,
+        place: "Cityville",
+        imageURLs: [
+            "https://via.placeholder.com/300",
+            "https://via.placeholder.com/300"
+        ],
+        ownerName: "John Doe",
+        ownerContact: "john.doe@example.com",
+        viewCount: 120,
+        days: 7,
+        numSaved: 15,
+        isFurnished: true,
+        isAvailable: true
+    ))
+    .environmentObject(AuthenticationView())
 }
+

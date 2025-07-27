@@ -1,49 +1,23 @@
 import SwiftUI
 
-
 struct Carousel: View {
-    @Binding var estates : [EstateMain]
-    @Binding var selected: Int // Initial selection
-    
-    var body: some View {
-         
-           /* HStack {
-                ForEach(estatesDemo) { demo in
-                    Text(String(demo.id))
-                        .padding(15)
-                        .background(demo.visited ? Color.red.opacity(0.5) : Color.blue.opacity(0.5))
-                        .cornerRadius(8)
-                        .overlay {
-                            Rectangle()
-                                .stroke(selected == demo.id ? Color.yellow : Color.black, lineWidth: 2)
-                        }
-                        .onTapGesture {
-                            selected = demo.id
-                            if let index = estatesDemo.firstIndex(where: { $0.id == demo.id }) {
-                                estatesDemo[index].visited = true
-                            }
-                        }
-                }
-            }
-            .padding(.bottom, 20)*/
-           
-            
-        TabView(selection: $selected) {
-                ForEach(estates) { demo in
-                    EstateCard(estate: demo)
-                        .tag(demo.id)
-                }
-            }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            .frame(height: 400)
-            .onAppear {
-                estates[selected].description = "visited"
-            }
-          
+    @Binding var estates: [EstateMain]
+    @Binding var selected: Int
 
-       
+    var body: some View {
+        TabView(selection: $selected) {
+            ForEach(estates) { estate in
+                EstateCard(estate: estate)
+                    .frame(width: UIScreen.main.bounds.width * 0.85, height: 380)
+                    .cornerRadius(20)
+                    .padding(.horizontal, 10)
+                    .scaleEffect(estate.id == selected ? 1.0 : 0.9) // istakni selektovanu
+                    .animation(.easeInOut(duration: 0.3), value: selected)
+                    .tag(estate.id)
+            }
+        }
+        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+        .frame(height: 400)
+        .padding(.horizontal, 20) // ovo omogućava da kartice "vire"
     }
 }
-
-
-

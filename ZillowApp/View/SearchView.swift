@@ -13,13 +13,11 @@ struct LocationItem:Identifiable {
     var id = UUID()
     var coordinate:CLLocationCoordinate2D
 }
-
-
 struct SearchView: View {
     @State var bottomSheetPosition : BottomSheetPosition = .relative(0.2)
     
     @State private var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 44.7866, longitude: 20.4489), span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
+        center: CLLocationCoordinate2D(latitude: 44.7266, longitude: 20.4389), span: MKCoordinateSpan(latitudeDelta: 0.3, longitudeDelta: 0.3)
     )
     @State private var showSheet2:Bool = false
     @State private var selectedImage:String = "map"
@@ -31,7 +29,9 @@ struct SearchView: View {
     @State private var mapType: MKMapType = .standard
     @State private var isVisible2:Bool = false
     @State var current:Int = 0
+    @State private var isOnEmail:Bool = false
     @State private var resultsText: String = "No matching results"
+    
 
 
     @State private var isNavigatingToSearch = false
@@ -45,6 +45,7 @@ struct SearchView: View {
     @State private var minHeight: CGFloat = 50 // Minimalna visina div-a
 
 
+    @State private var searchName = "For sale near 90403"
 
     
     let markers = [
@@ -66,7 +67,7 @@ struct SearchView: View {
     @State private var isPresented:Bool = true
     @State private var demo = 0
     @State private var bp = 0
-    
+    @State var visited:[Int] = []
     @State var mapOption = 1
     @State private var cameraPosition = MapCameraPosition.region(
            MKCoordinateRegion(
@@ -74,26 +75,26 @@ struct SearchView: View {
                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
            )
        )
+    @State private var presented:Bool = false
     @EnvironmentObject var locationManager:LocationManager
 
+    @EnvironmentObject var auth:AuthenticationView
     var body: some View {
         NavigationStack {
             VStack {
                 SearchBarView()
+                    .padding(.top,2)
                 Spacer()
                 
                 
                 Map(coordinateRegion: $region, annotationItems: viewModel.estates){ estate in
                     /*MapMarker(coordinate: location.coordinate, tint:.red)*/
                     MapAnnotation(coordinate: CLLocationCoordinate2DMake(estate.latitude, estate.longitude)) {
-                        CustomMarker(marker: estate, current: $current, isVisible: $isVisible2)
+                        CustomMarker(marker: estate, current: $current, isVisible: $isVisible2,visited: $visited)
                             .onTapGesture {
                                 current = estate.id
                             }
-                          
-                    
                     }
-                    
                 }
                 .mapStyle(mapOption==1 ? .standard : (mapOption==2 ? .imagery : .hybrid(elevation:.realistic)))
                 .onAppear {
@@ -102,18 +103,20 @@ struct SearchView: View {
                 .onTapGesture {
                     if isVisible2==true {
                         isVisible2 = false
-                        current = 0
+                        if current > 0 {current = 0}
                     }
                 }
             
                 .overlay {
                     if isVisible2 {
+                        
                         Carousel(estates: $viewModel.estates,selected:$current)
                             .padding(.top,200)
                     }
+                    
                     else {
                             Spacer()
-                        MapOptionsLineView(region: $region, option: $mapOption)
+                        MapOptionsLineView(presented:$presented, region: $region, option: $mapOption)
                                 .padding(.horizontal)
                                 .padding(.top,470)
                             
@@ -122,10 +125,11 @@ struct SearchView: View {
                                         
                                         VStack {
                                             Text("\(viewModel.estates.count) found").bold().padding()
+                                            Text(String(auth.uid ?? 0))
                                             ScrollView {
                                                 VStack(spacing: 10) { // Dodajte razmak između kartica za bolju vidljivost
                                                     ForEach(viewModel.estates) { estate in
-                                                        NavigationLink(destination:EstateView(estate:estate)){
+                                                        NavigationLink(destination:EstateView(estate: estate)){
                                                             EstateCard(estate: estate)
                                                                 .frame(maxWidth: .infinity) // Osigurajte da kartica zauzima maksimalnu širinu
                                                         }
@@ -156,8 +160,8 @@ struct SearchView: View {
                                             .transition(.opacity)
                                             .padding(.top, UIScreen.main.bounds.height - 360) // Visina ekrana minus 80
                                             
-
-                                         
+                                            
+                                            
                                         }
                                         
                                     }
@@ -170,6 +174,67 @@ struct SearchView: View {
                                 }
                         
                     }
+            }
+            .onChange(of: locationManager.location){newValue in
+                viewModel.getAllEstates2(place: newValue)
+            }
+            .sheet(isPresented: $presented){
+                VStack {
+                    HStack {
+                        Text("Save search")
+                            .font(Font.custom("AvenirLTStd-Black", size: 23)).bold()
+                        Spacer()
+                        Image(systemName: "x.circle.fill").foregroundStyle(Color.gray)
+                    }
+                    .padding(.vertical,7)
+                    Divider()
+                    Text("Get push and email notifications when new homes go on the market.")
+                        .font(Font.custom("AvenirLTStd-Medium", size: 19)).bold()
+                        .foregroundStyle(Color.black.opacity(0.7))
+                        .frame(alignment: .leading)
+                        .padding(.vertical)
+                        .lineLimit(nil)  // Omogućava neograničen broj redova
+                                    .fixedSize(horizontal: false, vertical: true) // Sprečava skraćivanje teksta
+                    
+                    Text("Name your search")
+                        .font(Font.custom("AvenirLTStd-Black", size: 19)).bold()
+                        .frame(maxWidth:.infinity, alignment: .leading)
+                    TextField("",text:$searchName)
+                        .padding(8)
+                        .font(Font.custom("AvenirLTStd-Medium", size: 19))
+                        .foregroundStyle(Color.black.opacity(0.7))
+                    
+                   
+
+                
+             
+                .overlay {
+                    RoundedRectangle(cornerRadius: 5)
+                        .stroke(Color.black.opacity(0.7))
+                }
+                    Toggle("Email notifications",isOn: $isOnEmail)
+                        .padding(.vertical)
+                        .font(Font.custom("AvenirLTStd-Black", size: 19))
+                    
+                    Button(action:{}){
+                        Text("Save search")
+                            .padding(.vertical,13)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .background(Color.myBlue)
+                    .foregroundStyle(Color.white)
+                    .bold()
+                    .font(Font.custom("AvenirLTStd-Black", size: 19))
+                    
+
+                    Spacer()
+                    
+                }
+                .padding()
+                .presentationDetents([.height(350)])
+                
+                
+                
             }
             
             
@@ -228,7 +293,7 @@ struct SearchView: View {
             }
         }*/
         .onAppear {
-            viewModel.getAllEstates()
+            viewModel.getAllEstates2(place: locationManager.location)
         }
         
     }
@@ -239,6 +304,7 @@ struct SearchView: View {
 #Preview {
     SearchView()
         .environmentObject(LocationManager())
+        .environmentObject(AuthenticationView())
 }
 
 struct TabBarItem: View {

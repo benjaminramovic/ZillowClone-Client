@@ -13,6 +13,8 @@ struct MapOptionsLineView: View {
     @State private var selectedImage:String = "map"
     @State private var selectedRisk:String = ""
     @State private var selectedAnemity:String = ""
+    @Binding var presented:Bool
+
 
     @State private var isOn:Bool = false
     
@@ -296,7 +298,9 @@ struct MapOptionsLineView: View {
                 .shadow(radius: 13)
             }
             Spacer()
-            Button(action:{}) {
+            Button(action:{
+                presented = true
+            }) {
                 
                 Label("Save Search",systemImage: "magnifyingglass")
                     .padding(10)

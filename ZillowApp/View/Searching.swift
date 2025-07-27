@@ -11,14 +11,14 @@ struct Searching: View {
     @State private var tags: [String] = ["tag1", "tag2", "tag3"]
     @State private var newTag: String = ""
     @State private var selectedTab:String = "For Sale"
-    @State private var history:[String] = [
-        "California Incline, 3rd St, Santa Monica, CA",
-        "Los Angeles CA homes",
-        "El Paso TX Homes"
-    ]
+  
     @EnvironmentObject var locationManager : LocationManager
     
-
+    @StateObject private var estateVM = EstateViewModel()
+    @State private var history:[String] = [
+        "Ocean Dr, Seaside",
+       
+    ]
 
     init(){
         UISegmentedControl.appearance().selectedSegmentTintColor = UIColor(Color.myBlue)
@@ -74,6 +74,7 @@ struct Searching: View {
                 Button(action:{
                     dodajTag(newTag)
                     locationManager.location = newTag
+                    
                     //newTag = ""
                 }){
                     Text("Dodaj tag")
@@ -100,12 +101,18 @@ struct Searching: View {
                     Divider()
                     Text("Search history").bold().frame(maxWidth:.infinity,alignment: .leading).padding(.vertical)
                     
-                    ForEach(history,id:\.self){item in
+                    ForEach(estateVM.locations,id:\.self){item in
                         HStack {
                             Image(systemName: "location")
                             Text(item)
                         }
                         .frame(maxWidth:.infinity,alignment: .leading)
+                        .onTapGesture {
+                            history.append(item)
+                            locationManager.location = item
+                            dismiss()
+                            print(item)
+                        }
                         Divider()
                         
                     }
@@ -124,6 +131,10 @@ struct Searching: View {
                 
             }
             .padding(.horizontal)
+            .onAppear{
+                estateVM.loadLocations()
+
+            }
             
         }
         .navigationBarBackButtonHidden(true)

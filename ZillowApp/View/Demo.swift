@@ -22,7 +22,7 @@ struct Demo: View {
             }
             .navigationTitle("Estates")
             .onAppear {
-                viewModel.getAllEstates()
+                
             }
         }
        

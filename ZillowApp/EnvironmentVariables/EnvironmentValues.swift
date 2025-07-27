@@ -25,7 +25,10 @@ extension View {
     }
 }*/
 class LocationManager: ObservableObject {
-    @Published var location: String = "Novi Pazar"
+    @Published var location: String = "Green Rd, Suburbia"
     @Published var visited:[Bool] = [false,false,false,false,false,false,false,false,false,false]
+    @Published var userId:Int = 0;
 }
+
+
 

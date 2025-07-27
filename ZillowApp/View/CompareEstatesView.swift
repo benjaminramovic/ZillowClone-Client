@@ -16,8 +16,5 @@ struct CompareEstatesView: View {
     }
 }
 
-#Preview {
-    CompareEstatesView(estates: [
-        EstateMain(id: 1, title: "Title", description: "Description", price: 123.5, latitude: 41.1234, longitude: 21.1123)
-    ])
-}
+
+

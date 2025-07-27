@@ -6,9 +6,20 @@
 //
 
 import SwiftUI
+import Firebase
+import FirebaseAuth
+import GoogleSignIn
+import GoogleSignInSwift
 
 struct LoginRegisterView: View {
     @State private var email:String = ""
+    @State private var password:String = ""
+
+    @State private var loginError = ""
+    @State private var isLoggedIn = false
+    @EnvironmentObject var vm: AuthenticationView
+
+    
     var body: some View {
         NavigationView{
             VStack(spacing: 20) {
@@ -50,6 +61,36 @@ struct LoginRegisterView: View {
                         Text("or")
                     }
                         VStack {
+                            
+                           /* Button(action:{ login() }){
+                                Label("Continue with Google", image: .google)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .foregroundStyle(.gray)
+                                    .background(Color.white)
+                                    .border(Color.gray, width: 2)
+                                
+                            }*/
+                            GoogleSignInButton(viewModel: GoogleSignInButtonViewModel(scheme: .light)){
+                                
+                                
+                                vm.signInWithGoogle()
+                            }
+                            .padding(.bottom)
+                            if !loginError.isEmpty{
+                                Text(loginError)
+                                    .foregroundColor(.red)
+                                    .padding()
+                            }
+                            
+                            NavigationLink(value: isLoggedIn){
+                                EmptyView()
+                            }
+                            .navigationDestination(isPresented: $isLoggedIn){
+                                ContentView()
+                                    .navigationBarBackButtonHidden(true)
+                            }
+                            
                             Button(action:{}){
                                 
                                 Label("Continue with Apple",systemImage: "apple.logo")
@@ -71,15 +112,6 @@ struct LoginRegisterView: View {
                                     .foregroundStyle(.white)
                                     .frame(maxWidth: .infinity)
                                     .background(Color.myBlue)
-                                
-                            }
-                            Button(action:{}){
-                                Label("Continue with Google", image: .google)
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .foregroundStyle(.gray)
-                                    .background(Color.white)
-                                    .border(Color.gray, width: 2)
                                 
                             }
                         
@@ -108,8 +140,21 @@ struct LoginRegisterView: View {
         }
     
     }
+    func login() {
+        Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
+        
+            if let error = error {
+                loginError = error.localizedDescription
+            }
+            
+            isLoggedIn = true
+        }
+    }
 }
 
 #Preview {
+    @StateObject var authView = AuthenticationView()
+
     LoginRegisterView()
+        .environmentObject(authView)
 }
