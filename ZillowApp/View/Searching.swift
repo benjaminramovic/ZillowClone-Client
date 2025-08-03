@@ -19,12 +19,23 @@ struct Searching: View {
         "Ocean Dr, Seaside",
        
     ]
+    var filteredLocations:[String] {
+        if newTag.isEmpty {
+            return estateVM.locations
+        }
+        else {
+            return estateVM.locations.filter { $0.lowercased().contains(newTag.lowercased()) }
+
+        }
+    }
 
     init(){
         UISegmentedControl.appearance().selectedSegmentTintColor = UIColor(Color.myBlue)
         UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor:UIColor.white], for: .selected)
     }
     @Environment(\.dismiss) var dismiss
+    
+  
 
     var body: some View {
         NavigationStack {
@@ -60,6 +71,7 @@ struct Searching: View {
                             
                         }
                         TextField("Home, feature, school, location...",text: $newTag)
+                            .textContentType(.addressCityAndState)
                             .keyboardType(.default)
                             .autocapitalization(.none)
                             .textInputAutocapitalization(.none)
@@ -70,6 +82,8 @@ struct Searching: View {
                         RoundedRectangle(cornerSize: .zero)
                             .stroke(Color.black,lineWidth:1)
                     }
+                    
+              
                 }
                 Button(action:{
                     dodajTag(newTag)
@@ -93,7 +107,7 @@ struct Searching: View {
                 Divider()
                 ScrollView {
                     HStack {
-                        Image(systemName: "location")
+                        Image(systemName: "location.magnifyingglass")
                         Text("Current Location")
                     }
                     .frame(maxWidth:.infinity,alignment: .leading)
@@ -101,7 +115,7 @@ struct Searching: View {
                     Divider()
                     Text("Search history").bold().frame(maxWidth:.infinity,alignment: .leading).padding(.vertical)
                     
-                    ForEach(estateVM.locations,id:\.self){item in
+                    ForEach(filteredLocations,id:\.self){item in
                         HStack {
                             Image(systemName: "location")
                             Text(item)

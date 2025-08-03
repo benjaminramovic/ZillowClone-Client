@@ -123,14 +123,25 @@ struct EstateCard: View {
         .background(Color.white)
         .sheet(isPresented: $showSheet){
             VStack(spacing:20){
-                Circle()
-                    .fill(Color.favoriteRed)
-                    .frame(width:40, height: 40)
-                    .overlay {
-                        Image(systemName: "heart.fill")
-                            .foregroundStyle(Color.white)
-                            .frame(width:27,height:27)
-                    }
+                HStack {
+                    Spacer()
+                    Circle()
+                        .fill(Color.favoriteRed)
+                        .frame(width:40, height: 40)
+                        .overlay {
+                            Image(systemName: "heart.fill")
+                                .foregroundStyle(Color.white)
+                                .frame(width:27,height:27)
+                        }
+                        .padding(.leading,25)
+                    Spacer()
+                    Image(systemName: "x.circle")
+                        .resizable()
+                        .frame(width:30, height: 30)
+                        .onTapGesture {
+                            showSheet = false
+                        }
+                }
                 Text("Home saved!")
                     .foregroundStyle(Color.favoriteGray)
                 
@@ -141,10 +152,19 @@ struct EstateCard: View {
                     ForEach(tags1, id:\.self){val in
                      Text(val)
                             .font(.subheadline)
+                            .padding(5)
+                            .overlay (
+                                RoundedRectangle(cornerRadius: 13)
+                                    .stroke( Color.black.opacity(0.5), lineWidth:1)
+                            )
+                            
                             .onTapGesture {
                                 if !selected.contains(val) {
                                     selected.append(val)
-                                } 
+                                }
+                                else if let index = selected.firstIndex(of: val) {
+                                    selected.remove(at: index)
+                                }
                             }
                             .foregroundStyle(selected.contains(val) ? Color.myBlue : Color.black)
                     }
@@ -153,6 +173,21 @@ struct EstateCard: View {
                     ForEach(tags2, id:\.self){val in
                      Text(val)
                             .font(.subheadline)
+                            .padding(5)
+                            .overlay (
+                                RoundedRectangle(cornerRadius: 13)
+                                    .stroke( Color.black.opacity(0.5), lineWidth:1)
+                            )
+                            
+                            .onTapGesture {
+                                if !selected.contains(val) {
+                                    selected.append(val)
+                                }
+                                else if let index = selected.firstIndex(of: val) {
+                                    selected.remove(at: index)
+                                }
+                            }
+                            .foregroundStyle(selected.contains(val) ? Color.myBlue : Color.black)
                 
                     }
                 } .frame(maxWidth:.infinity,alignment: .leading)
@@ -160,11 +195,28 @@ struct EstateCard: View {
                     ForEach(tags3, id:\.self){val in
                      Text(val)
                             .font(.subheadline)
+                            .padding(5)
+                            .overlay (
+                                RoundedRectangle(cornerRadius: 13)
+                                    .stroke( Color.black.opacity(0.5), lineWidth:1)
+                            )
+                            
+                            .onTapGesture {
+                                if !selected.contains(val) {
+                                    selected.append(val)
+                                }
+                                else if let index = selected.firstIndex(of: val) {
+                                    selected.remove(at: index)
+                                }
+                            }
+                            .foregroundStyle(selected.contains(val) ? Color.myBlue : Color.black)
                     }
                 } .frame(maxWidth:.infinity,alignment: .leading)
                 
                 Divider()
-                Button(action:{}){
+                Button(action:{
+                    showSheet.toggle()
+                }){
                     Text("Save my tags")
                 }
 
@@ -173,7 +225,7 @@ struct EstateCard: View {
             }
             .padding()
             .padding(.bottom,0)
-            .presentationDetents([.fraction(0.45)])
+            .presentationDetents([.fraction(0.5)])
             
         }
       
