@@ -153,10 +153,13 @@ struct EstateCard: View {
                      Text(val)
                             .font(.subheadline)
                             .padding(5)
+                            
                             .overlay (
                                 RoundedRectangle(cornerRadius: 13)
-                                    .stroke( Color.black.opacity(0.5), lineWidth:1)
+                                    .stroke(!selected.contains(val) ?  Color.black.opacity(0.5) : Color.myBlue, lineWidth:1)
+                                   
                             )
+                           
                             
                             .onTapGesture {
                                 if !selected.contains(val) {
@@ -167,6 +170,7 @@ struct EstateCard: View {
                                 }
                             }
                             .foregroundStyle(selected.contains(val) ? Color.myBlue : Color.black)
+                            
                     }
                 } .frame(maxWidth:.infinity,alignment: .leading)
                 HStack {
@@ -176,7 +180,7 @@ struct EstateCard: View {
                             .padding(5)
                             .overlay (
                                 RoundedRectangle(cornerRadius: 13)
-                                    .stroke( Color.black.opacity(0.5), lineWidth:1)
+                                    .stroke(!selected.contains(val) ?  Color.black.opacity(0.5) : Color.myBlue, lineWidth:1)
                             )
                             
                             .onTapGesture {
@@ -198,7 +202,7 @@ struct EstateCard: View {
                             .padding(5)
                             .overlay (
                                 RoundedRectangle(cornerRadius: 13)
-                                    .stroke( Color.black.opacity(0.5), lineWidth:1)
+                                    .stroke(!selected.contains(val) ?  Color.black.opacity(0.5) : Color.myBlue, lineWidth:1)
                             )
                             
                             .onTapGesture {
